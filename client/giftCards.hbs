@@ -1,0 +1,162 @@
+<div class="panel-page-outer">
+  <div id="corporate-giftcards-view" class="panel-page-inner">
+  
+  {{#if isReady}}
+    
+    {{#if hasAccess}} 
+    
+      <div class="corporate-giftcards-left-column">
+      
+        <div class="app-giftcard-checker page-panel left-panel">
+          {{input type="text" id="giftcard-checker-giftcard-input" value=giftcardString placeholder="gift card code"}}
+          <span class="giftcard-checker-giftcard-button" {{action getGiftCardBalance}}>balance</span>
+          {{#if giftcard}}
+            <div {{bindAttr class=":giftcard-checker-giftcard-item"}}>
+              <label>Code</label>
+              <p class="giftcard-checker-giftcard-details">{{giftcard.code}}</p>
+              <label>Purchased</label>
+              <p class="giftcard-checker-giftcard-details">{{asCurrencyWithSymbol giftcard.startBalance}}</p>
+              <label>Balance</label>
+              <p class="giftcard-checker-giftcard-details">{{asCurrencyWithSymbol giftcard.balance}}</p>
+              <label>Location</label>
+              <p class="giftcard-checker-giftcard-details">{{asLocationNameOrCorporate giftcard.locationId}}</p>
+            </div>
+          {{/if}}
+        </div>
+      
+        <div class="app-giftcard-checker page-panel left-panel giftcard-sales-stats">
+          <h3>Gift Card Sales Stats</h3>
+          
+          <label>today</label>
+          <p>
+            {{asCurrencyWithSymbol giftCardSalesData.today.total}}
+            <span class='descriptor'>({{giftCardSalesData.today.count}})</span>
+          </p>
+          
+          <label>week to date</label>
+          <p>
+            {{asCurrencyWithSymbol giftCardSalesData.weekToDate.total}}
+            <span class='descriptor'>({{giftCardSalesData.weekToDate.count}})</span>
+          </p>
+          
+          <label>month to date</label>
+          <p>
+            {{asCurrencyWithSymbol giftCardSalesData.monthToDate.total}}
+            <span class='descriptor'>({{giftCardSalesData.monthToDate.count}})</span>
+          </p>
+        </div>
+        
+      </div>
+      
+
+      <div class="corporate-giftcards-right-column">
+        
+        {{#if giftcard}}
+          <div id="giftcard-history-view" class="page-panel">
+            <h3>Giftcard History for {{giftcard.code}}</h3>
+            
+            <table class="gift-card-transations">
+              <thead>
+                <th class="date">Date</th>
+                <th class="description">Description</th>
+                <th class="amount">Amount</th>
+              </thead>
+              
+              <tbody>
+              
+                <tr>
+                  <td class="date">{{asShortDate giftcard.created}}</td>
+                  <td class="description">Created at {{asLocationNameOrCorporate giftcard.locationId}}</td>
+                  <td class="amount">{{asCurrencyWithSymbol giftcard.startBalance}}</td>
+                </tr>
+                
+                {{#if giftcard.missingBalance}}
+                  <tr>
+                    <td class="date">n/a</td>
+                    <td class="description">Archived Transactions</td>
+                    <td class="amount">{{asCurrencyWithSymbol giftcard.missingBalance}}</td>
+                  </tr>
+                {{/if}}
+                
+                {{#each t in giftcard.transactions}}
+                  <tr>
+                    <td class="date">{{asShortDate t.created}}</td>
+                    <td class="description">
+                      ID: {{t._id}}
+                      {{#if t.checkId}}
+                        {{#if t.isHomeLocation}}
+                          {{linkedCheck t.checkId}} <span class='descriptor'>{{t.checkId}}</span>
+                        {{else}}
+                          <span class='descriptor'>Check ID {{t.checkId}} at {{asLocationName t.locationId}}</span>
+                        {{/if}}
+                      {{else}}
+                        {{#if t.employeeUserId}}
+                          <span class='descriptor'>Manual edit by employee {{asEmployeeName t.employeeUserId}}</span>
+                        {{/if}}
+                      {{/if}}
+                    </td>
+                    <td class="amount">{{asCurrencyWithSymbol t.negativeTotal}}</td>
+                  </tr>
+                {{/each}}
+                
+                <tr>
+                  <td class="date">&nbsp;</td>
+                  <td class="description">Current Balance</td>
+                  <td class="amount">{{asCurrencyWithSymbol giftcard.balance}}</td>
+                </tr>
+                
+              </tbody>
+            </table>
+            
+            {{#if canEdit}}
+            
+              <h4 class='edit-balance'>Add Or Subtract Gift Card Balance</h4>
+              <label>Amount</label>
+              {{view App.CurrencyField classBinding=":edit-balance" valueBinding="changeBalanceBy"}}
+              <input type='button' value='submit' {{action updateGiftCardBalance}} />
+            
+            {{/if}}
+            
+          </div>
+          
+          
+        {{else}}
+        
+          {{#if canEdit}}
+        
+            <div id="giftcard-history-view" class="page-panel">
+              <h4>New Gift Card</h4>
+              {{view Ember.Select
+                contentBinding="locationOptions"
+                optionLabelPath="content.name"
+                optionValuePath="content.value"
+                valueBinding="newGiftcard.locationId"
+                prompt="corporate gift card" }}
+              {{view Ember.TextField valueBinding="newGiftcard.code" placeholder="gift card code"}}
+              {{view App.CurrencyField valueBinding="newGiftcard.balance" placeholder="gift card balance"}}
+              <input type='button' value='submit' {{action addNewGiftCard}} />
+            </div>
+          
+          {{/if}}
+        
+        {{/if}}
+        
+      </div>
+      
+        
+    {{else}}
+      
+      <div class="credentials-alert">
+        <p>Please PIN with appropriate permissions to use the gift cards view.</p>
+      </div>
+        
+    {{/if}}
+    
+  {{else}}
+
+    <div class="panel-loading"></div>
+      
+  {{/if}}
+
+  </div>
+</div>
