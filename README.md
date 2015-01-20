@@ -1,4 +1,4 @@
-# giftCardManager
+# giftCardManager (server)
 Sample Collection (Manager) &amp; Document (Model) classes for gift card API
 
 These classes work together as a Manager (gift card collection) and Model (gift card document) and 
@@ -14,3 +14,9 @@ classes can access MongoManager directly. These classes should never establish a
 comunicate via their respective Base classes or via MongoManager directly.
 
 These classes are built in coffeescript and intended as a guide for a typical Manager/Model handling API calls.
+
+
+# giftcards.coffee, giftcards.hbs (client)
+giftcards.coffee initializes the Ember controller and object for giftcards and works with the handlebars template giftcards.hbs
+
+Base of these files are utilized by the base giftcards/application.coffee and giftcards/application.hbs files which are thin wrappers that follow the applications typical initialization of a view. For example, application coffee would trigger any set up data loading (see dbLoader smaple code) and create the top level App (Ember.App). giftcards/application.hbs provides headers/footers and some high level div wrappers utilizing base styling classes. There should be no need to edit any of these while customizing the giftcards view. 
